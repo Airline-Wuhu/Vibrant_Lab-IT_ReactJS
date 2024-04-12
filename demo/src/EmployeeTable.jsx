@@ -1,5 +1,8 @@
 import { Table, Button, Tag, Badge } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { getAllEmployees } from "./client";
+import InsertRowForm from "./forms/InsertRowForm";
+import { useState } from "react";
 
 const columns = [
   {
@@ -34,53 +37,7 @@ const columns = [
     sorter: (a, b) => a.experience - b.experience,
   },
 ];
-const employeesData = [
-  {
-    id: 1,
-    name: "John Doe",
-    position: "Software Engineer",
-    department: "Engineering",
-    age: 30,
-    salary: 80000,
-    experience: 5,
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    position: "UI/UX Designer",
-    department: "Design",
-    age: 28,
-    salary: 70000,
-    experience: 4,
-  },
-  {
-    id: 3,
-    name: "Michael Johnson",
-    position: "Product Manager",
-    department: "Product Management",
-    age: 35,
-    salary: 100000,
-    experience: 7,
-  },
-  {
-    id: 4,
-    name: "Emily Brown",
-    position: "Marketing Specialist",
-    department: "Marketing",
-    age: 32,
-    salary: 75000,
-    experience: 6,
-  },
-  {
-    id: 5,
-    name: "William Taylor",
-    position: "Data Analyst",
-    department: "Analytics",
-    age: 27,
-    salary: 65000,
-    experience: 3,
-  },
-];
+
 const onChange = (pagination, filters, sorter, extra) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -107,46 +64,62 @@ const modifyData = (employeesData, filterWord) => {
   return employeesData;
 };
 const EmployeeTable = ({ searchText }) => {
-  const modifiedData = modifyData(employeesData, searchText);
+  const [showDrawer, setShowDrawer] = useState(false);
+  // const [employeesData, setEmployeesData] = useState([]);
+  // const [modifiedData, setModifiedData] = useState([]);
+  let employeesData,
+    modifiedData = [];
+  const fetchEmployees = () => {
+    employeesData = getAllEmployees();
+    modifiedData = modifyData(employeesData, searchText);
+  };
+  fetchEmployees();
   // console.log(employeesData);
 
   return (
-    <Table
-      columns={columns}
-      dataSource={modifiedData}
-      title={() => (
-        <>
-          <Button
-            // onClick={() => setShowDrawer(!showDrawer)}
-            type="primary"
-            shape="round"
-            icon={<PlusOutlined />}
-            size="small"
-          >
-            Add a new employee
-          </Button>
-          <br />
-          <br />
-          <Tag>Number of TOTAL employees</Tag>
-          <Badge
-            className="site-badge-count"
-            count={employeesData.length}
-            style={{ backgroundColor: "#52c41a" }}
-            showZero={true}
-          />
-          <br></br>
-          <br></br>
-          <Tag>Number of FILTERED employees</Tag>
-          <Badge
-            className="site-badge-count"
-            count={modifiedData.length || 0}
-            style={{ backgroundColor: "#52c41a" }}
-            showZero={true}
-          />
-        </>
-      )}
-      onChange={onChange}
-    />
+    <>
+      <InsertRowForm
+        showDrawer={showDrawer}
+        setShowDrawer={setShowDrawer}
+        fetchEmployees={fetchEmployees}
+      />
+      <Table
+        columns={columns}
+        dataSource={modifiedData}
+        title={() => (
+          <>
+            <Button
+              onClick={() => setShowDrawer(!showDrawer)}
+              type="primary"
+              shape="round"
+              icon={<PlusOutlined />}
+              size="small"
+            >
+              Add a new employee
+            </Button>
+            <br />
+            <br />
+            <Tag>Number of TOTAL employees</Tag>
+            <Badge
+              className="site-badge-count"
+              count={employeesData.length}
+              style={{ backgroundColor: "#52c41a" }}
+              showZero={true}
+            />
+            <br></br>
+            <br></br>
+            <Tag>Number of FILTERED employees</Tag>
+            <Badge
+              className="site-badge-count"
+              count={modifiedData.length || 0}
+              style={{ backgroundColor: "#52c41a" }}
+              showZero={true}
+            />
+          </>
+        )}
+        onChange={onChange}
+      />
+    </>
   );
 };
 

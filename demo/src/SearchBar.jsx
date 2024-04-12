@@ -5,6 +5,7 @@ const SearchBar = ({ searchText, setSearchText }) => {
     <Input
       placeholder="Search Text"
       value={searchText}
+      allowClear={true}
       onChange={(event) => setSearchText(event.target.value)}
     />
   );
