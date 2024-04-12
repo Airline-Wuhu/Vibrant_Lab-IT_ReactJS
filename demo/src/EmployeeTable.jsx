@@ -1,4 +1,5 @@
-import { Table } from "antd";
+import { Table, Button, Tag, Badge } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 const columns = [
   {
@@ -105,13 +106,48 @@ const modifyData = (employeesData, filterWord) => {
 
   return employeesData;
 };
-const StudentTable = ({ searchText }) => {
+const EmployeeTable = ({ searchText }) => {
   const modifiedData = modifyData(employeesData, searchText);
   // console.log(employeesData);
 
   return (
-    <Table columns={columns} dataSource={modifiedData} onChange={onChange} />
+    <Table
+      columns={columns}
+      dataSource={modifiedData}
+      title={() => (
+        <>
+          <Button
+            // onClick={() => setShowDrawer(!showDrawer)}
+            type="primary"
+            shape="round"
+            icon={<PlusOutlined />}
+            size="small"
+          >
+            Add a new employee
+          </Button>
+          <br />
+          <br />
+          <Tag>Number of TOTAL employees</Tag>
+          <Badge
+            className="site-badge-count"
+            count={employeesData.length}
+            style={{ backgroundColor: "#52c41a" }}
+            showZero={true}
+          />
+          <br></br>
+          <br></br>
+          <Tag>Number of FILTERED employees</Tag>
+          <Badge
+            className="site-badge-count"
+            count={modifiedData.length || 0}
+            style={{ backgroundColor: "#52c41a" }}
+            showZero={true}
+          />
+        </>
+      )}
+      onChange={onChange}
+    />
   );
 };
 
-export default StudentTable;
+export default EmployeeTable;

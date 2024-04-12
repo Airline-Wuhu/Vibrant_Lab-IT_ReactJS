@@ -1,7 +1,8 @@
 import { Breadcrumb, Layout, Input, Image, Menu } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState, useRef, useEffect } from "react";
-import StudentTable from "./StudentTable";
+import EmployeeTable from "./EmployeeTable";
+import SearchBar from "./SearchBar";
 const { Header, Content, Sider, Footer } = Layout;
 
 const App = () => {
@@ -51,10 +52,9 @@ const App = () => {
               key: "1",
               icon: <SearchOutlined />,
               label: (
-                <Input
-                  placeholder="search Text"
-                  onChange={(event) => setSearchText(event.target.value)} 
-                  //event listener to user input, pass to searchtext
+                <SearchBar
+                  searchText={searchText}
+                  setSearchText={setSearchText}
                 />
               ),
               title: "search",
@@ -87,7 +87,7 @@ const App = () => {
               minHeight: 360,
             }}
           >
-            <StudentTable searchText={searchText}/>
+            <EmployeeTable searchText={searchText} />
           </div>
         </Content>
         <Footer
