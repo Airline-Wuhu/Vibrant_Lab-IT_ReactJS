@@ -83,16 +83,34 @@ const employeesData = [
 const onChange = (pagination, filters, sorter, extra) => {
   console.log("params", pagination, filters, sorter, extra);
 };
-const StudentTable = () => {
+
+const modifyData = (employeesData, filterWord) => {
   // add keys to raw data to list in table
   employeesData.forEach((employee) => {
     employee.key = employee.id;
   });
+  //   console.log("added keys: ", employeesData);
 
-  //   console.log(employeesData);
+  // filter the data using the filter word, if the filter word is blank, skip it
+  if (filterWord) {
+    //create regular expression pattern to match the filterWord, case insensitive
+    var re = new RegExp(".*" + filterWord + ".*", "i");
+    // console.log("the regular expression: ", re);
+    const updatedData = employeesData.filter((employee) =>
+      Object.values(employee).some((value) => re.test(String(value)))
+    );
+    // console.log("filter: ", filterWord, "after filter: ", data);
+    return updatedData;
+  }
+
+  return employeesData;
+};
+const StudentTable = ({ searchText }) => {
+  const modifiedData = modifyData(employeesData, searchText);
+  // console.log(employeesData);
 
   return (
-    <Table columns={columns} dataSource={employeesData} onChange={onChange} />
+    <Table columns={columns} dataSource={modifiedData} onChange={onChange} />
   );
 };
 

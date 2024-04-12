@@ -1,19 +1,31 @@
-import { Breadcrumb, Layout, Menu, Image } from "antd";
-import SubMenu from "antd/es/menu/SubMenu";
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import { useState } from "react";
+import { Breadcrumb, Layout, Input, Image, Menu } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { useState, useRef, useEffect } from "react";
 import StudentTable from "./StudentTable";
-
 const { Header, Content, Sider, Footer } = Layout;
 
 const App = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const siderRef = useRef(null);
+
+  // use effect for side bar
+  // collapse when clicking outside of it
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (siderRef.current && !siderRef.current.contains(event.target)) {
+        setCollapsed(true);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [siderRef]);
+
+  // console.log(searchText);
 
   return (
     <Layout
@@ -26,28 +38,29 @@ const App = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        ref={siderRef}
       >
         <div className="logo" />
-        {/* <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
-          <Menu.Item key="1" icon={<PieChartOutlined />}>
-            Option 1
-          </Menu.Item>
-          <Menu.Item key="2" icon={<DesktopOutlined />}>
-            Option 2
-          </Menu.Item>
-          <SubMenu key="sub1" icon={<UserOutlined />} title={"User"}>
-            <Menu.Item key="3">Tom</Menu.Item>
-            <Menu.Item key="4">Bill</Menu.Item>
-            <Menu.Item key="5">Alex</Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub2" icon={<TeamOutlined />} title={"Team"}>
-            <Menu.Item key="6">Team 1</Menu.Item>
-            <Menu.Item key="8">Team 2</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="9" icon={<FileOutlined />}>
-            Files
-          </Menu.Item>
-        </Menu> */}
+        <Menu
+          theme="dark"
+          defaultSelectedKeys={["1"]}
+          mode="inline"
+          onClick={() => setCollapsed(false)}
+          items={[
+            {
+              key: "1",
+              icon: <SearchOutlined />,
+              label: (
+                <Input
+                  placeholder="search Text"
+                  onChange={(event) => setSearchText(event.target.value)} 
+                  //event listener to user input, pass to searchtext
+                />
+              ),
+              title: "search",
+            },
+          ]}
+        />
       </Sider>
       <Layout className="site-layout">
         <Header
@@ -74,7 +87,7 @@ const App = () => {
               minHeight: 360,
             }}
           >
-            <StudentTable />
+            <StudentTable searchText={searchText}/>
           </div>
         </Content>
         <Footer
