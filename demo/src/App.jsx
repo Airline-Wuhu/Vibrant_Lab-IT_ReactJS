@@ -1,4 +1,4 @@
-import { Breadcrumb, Layout, Input, Image, Menu } from "antd";
+import { Breadcrumb, Layout, Image, Menu } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState, useRef, useEffect } from "react";
 import EmployeeTable from "./EmployeeTable";

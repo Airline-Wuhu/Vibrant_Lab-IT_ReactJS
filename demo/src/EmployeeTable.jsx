@@ -1,14 +1,15 @@
 import { Table, Button, Tag, Badge, Popconfirm, Flex } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { getAllEmployees } from "./client";
+import { getAllEmployees, deleteEmployee } from "./client";
 import { useState, useEffect } from "react";
-import { deleteEmployee } from "./client";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
 } from "./forms/Notification";
 import InsertRowForm from "./forms/InsertRowForm";
 import EditRowForm from "./forms/EditRowForm";
+import LoadingPage from "./components/LoadingPage";
+
 const removeEmployee = (employID, callback) => {
   deleteEmployee(employID)
     .then(() => {
@@ -25,66 +26,74 @@ const removeEmployee = (employID, callback) => {
     });
 };
 
-const columns = (fetchEmployees, { setShowEditDrawer, setEditedEmployee }) => [
-  {
-    title: "ID",
-    dataIndex: "id",
-  },
-  {
-    title: "Name",
-    dataIndex: "name",
-  },
-  {
-    title: "Position",
-    dataIndex: "position",
-  },
-  {
-    title: "Department",
-    dataIndex: "department",
-  },
-  {
-    title: "Age",
-    dataIndex: "age",
-    sorter: (a, b) => a.age - b.age,
-  },
-  {
-    title: "Salary",
-    dataIndex: "salary",
-    sorter: (a, b) => a.salary - b.salary,
-  },
-  {
-    title: "Experience",
-    dataIndex: "experience",
-    sorter: (a, b) => a.experience - b.experience,
-  },
-  {
-    title: "Actions",
-    key: "actions",
-    render: (employee) => (
-      <Flex gap="small" wrap="wrap">
-        <Button
-          type="primary"
-          onClick={() => {
-            console.log("onclick: ", employee);
-            setEditedEmployee(employee);
-            setShowEditDrawer(true);
-          }}
-        >
-          edit
-        </Button>
-        <Popconfirm
-          title="Delete the Employee"
-          description="Are you sure to delete this employee record?"
-          onConfirm={() => removeEmployee(employee.id, fetchEmployees)}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button danger>Delete</Button>
-        </Popconfirm>
-      </Flex>
-    ),
-  },
-];
+const columns = (
+  fetchEmployees,
+  { setShowEditDrawer, setEditedEmployee, setFetching }
+) => {
+  return [
+    {
+      title: "ID",
+      dataIndex: "id",
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+    },
+    {
+      title: "Position",
+      dataIndex: "position",
+    },
+    {
+      title: "Department",
+      dataIndex: "department",
+    },
+    {
+      title: "Age",
+      dataIndex: "age",
+      sorter: (a, b) => a.age - b.age,
+    },
+    {
+      title: "Salary",
+      dataIndex: "salary",
+      sorter: (a, b) => a.salary - b.salary,
+    },
+    {
+      title: "Experience",
+      dataIndex: "experience",
+      sorter: (a, b) => a.experience - b.experience,
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (employee) => (
+        <Flex gap="small" wrap="wrap">
+          <Button
+            type="primary"
+            onClick={() => {
+              console.log("onclick: ", employee);
+              setEditedEmployee(employee);
+              setShowEditDrawer(true);
+            }}
+          >
+            edit
+          </Button>
+          <Popconfirm
+            title="Delete the Employee"
+            description="Are you sure to delete this employee record?"
+            onConfirm={() => {
+              setFetching(true);
+              removeEmployee(employee.id, fetchEmployees);
+            }}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger>Delete</Button>
+          </Popconfirm>
+        </Flex>
+      ),
+    },
+  ];
+};
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log("params", pagination, filters, sorter, extra);
@@ -114,10 +123,13 @@ const filterData = (data, filterWord) => {
 const EmployeeTable = ({ searchText }) => {
   const [showInsertDrawer, setShowInsertDrawer] = useState(false);
   const [showEditDrawer, setShowEditDrawer] = useState(false);
+  const [fetching, setFetching] = useState(false);
+
   const [employeesData, setEmployeesData] = useState([]);
   const [editedEmployee, setEditedEmployee] = useState({});
 
-  const fetchEmployees = () =>
+  const fetchEmployees = () => {
+    setFetching(true);
     getAllEmployees()
       .then((data) => {
         // console.log(data);
@@ -127,7 +139,9 @@ const EmployeeTable = ({ searchText }) => {
       })
       .catch((error) => {
         console.error("Error fetching employees:", error);
-      });
+      })
+      .finally(() => setFetching(false));
+  };
 
   useEffect(() => {
     console.log("component is mounted");
@@ -148,46 +162,53 @@ const EmployeeTable = ({ searchText }) => {
         fetchEmployees={fetchEmployees}
         employee={editedEmployee}
       />
-
-      <Table
-        columns={columns(fetchEmployees, {
-          setShowEditDrawer,
-          setEditedEmployee,
-        })}
-        dataSource={filterData(employeesData, searchText)}
-        title={() => (
-          <>
-            <Button
-              onClick={() => setShowInsertDrawer(!showInsertDrawer)}
-              type="primary"
-              shape="round"
-              icon={<PlusOutlined />}
-              size="small"
-            >
-              Add a new employee
-            </Button>
-            <br />
-            <br />
-            <Tag>Number of TOTAL employees</Tag>
-            <Badge
-              className="site-badge-count"
-              count={employeesData.length}
-              style={{ backgroundColor: "#52c41a" }}
-              showZero={true}
-            />
-            <br></br>
-            <br></br>
-            <Tag>Number of FILTERED employees</Tag>
-            <Badge
-              className="site-badge-count"
-              count={filterData(employeesData, searchText).length}
-              style={{ backgroundColor: "#52c41a" }}
-              showZero={true}
-            />
-          </>
-        )}
-        onChange={onChange}
-      />
+      {fetching ? (
+        <LoadingPage
+          message={"No data available yet... "}
+          description={"Fetching data from server..."}
+        />
+      ) : (
+        <Table
+          columns={columns(fetchEmployees, {
+            setShowEditDrawer,
+            setEditedEmployee,
+            setFetching,
+          })}
+          dataSource={filterData(employeesData, searchText)}
+          title={() => (
+            <>
+              <Button
+                onClick={() => setShowInsertDrawer(!showInsertDrawer)}
+                type="primary"
+                shape="round"
+                icon={<PlusOutlined />}
+                size="small"
+              >
+                Add a new employee
+              </Button>
+              <br />
+              <br />
+              <Tag>Number of TOTAL employees</Tag>
+              <Badge
+                className="site-badge-count"
+                count={employeesData.length}
+                style={{ backgroundColor: "#52c41a" }}
+                showZero={true}
+              />
+              <br></br>
+              <br></br>
+              <Tag>Number of FILTERED employees</Tag>
+              <Badge
+                className="site-badge-count"
+                count={filterData(employeesData, searchText).length}
+                style={{ backgroundColor: "#52c41a" }}
+                showZero={true}
+              />
+            </>
+          )}
+          onChange={onChange}
+        />
+      )}
     </>
   );
 };

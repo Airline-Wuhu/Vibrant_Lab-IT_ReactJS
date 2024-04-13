@@ -1,14 +1,8 @@
-// import fetch from "unfetch";
+// this file mimic the api calls to backend apis
+// all method returns a promise to mimic the results from backend
 
-// const checkStatus = response => {
-//     if (response.ok) {
-//         return response;
-//     }
-//     // return error
-//     const error = new Error(response.statusText);
-//     error.response = response;
-//     return Promise.reject(error);
-// }
+const delayTimeLapse = 2000; 
+// this is a variable to mimic the delay from backend
 
 let fakeDataBase = [
   {
@@ -60,38 +54,66 @@ let fakeDataBase = [
 
 export const getAllEmployees = () => {
   return new Promise((resolve, reject) => {
-    try {
-      if (fakeDataBase) {
-        resolve(fakeDataBase); // Resolve with the fakeDataBase
-      } else {
-        reject("Fake database is not available."); // Reject with an error message
+    setTimeout(() => {
+      try {
+        if (fakeDataBase) {
+          resolve(fakeDataBase);
+        } else {
+          reject("Fake database is not available.");
+        }
+      } catch (error) {
+        reject(error);
       }
-    } catch (error) {
-      reject(error); // Reject with the caught error
-    }
+    }, delayTimeLapse);
   });
 };
 
 export const addNewEmployee = (newEmployee) => {
-  if (fakeDataBase.some((employee) => employee.id === newEmployee.id))
-    return Promise.reject("Employee ID taken! Please try a new ID.");
-  fakeDataBase = fakeDataBase.concat(newEmployee);
-  return Promise.resolve(); // Return a resolved Promise
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Check if the employee ID is already taken
+      if (fakeDataBase.some((employee) => employee.id === newEmployee.id)) {
+        reject("Employee ID taken! Please try a new ID.");
+      } else {
+        setTimeout(() => {
+          fakeDataBase = fakeDataBase.concat(newEmployee);
+          resolve();
+        }, delayTimeLapse);
+      }
+    });
+  }, delayTimeLapse);
 };
 
 export const deleteEmployee = (employeeId) => {
-  if (!fakeDataBase.find((employee) => employee.id === employeeId))
-    return Promise.reject("Employee ID not found!");
-  fakeDataBase = fakeDataBase.filter((employee) => employee.id != employeeId);
-  return Promise.resolve(); // Return a resolved Promise
-};
-export const updateEmployee = (updatedEmployee) => {
-  if (!fakeDataBase.some((employee) => employee.id === updatedEmployee.id))
-    return Promise.reject("Employee ID not found!");
-  fakeDataBase.forEach((employee) => {
-    if (employee.id === updatedEmployee.id)
-      Object.assign(employee, updatedEmployee);
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (!fakeDataBase.find((employee) => employee.id === employeeId)) {
+        reject("Employee ID not found!");
+      } else {
+        fakeDataBase = fakeDataBase.filter(
+          (employee) => employee.id !== employeeId
+        );
+        resolve();
+      }
+    }, delayTimeLapse);
   });
-  console.log(fakeDataBase);
-  return Promise.resolve(); // Return a resolved Promise
+};
+
+export const updateEmployee = (updatedEmployee) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (
+        !fakeDataBase.some((employee) => employee.id === updatedEmployee.id)
+      ) {
+        reject("Employee ID not found!");
+      } else {
+        fakeDataBase.forEach((employee) => {
+          if (employee.id === updatedEmployee.id) {
+            Object.assign(employee, updatedEmployee);
+          }
+        });
+        resolve();
+      }
+    }, delayTimeLapse);
+  });
 };

@@ -1,20 +1,12 @@
 import { Button, Col, Drawer, Form, Input, Row, Spin } from "antd";
 import { updateEmployee } from "../client.jsx";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
+  warningNotificationWithIcon,
 } from "./Notification";
-
-const spinner = (
-  <LoadingOutlined
-    style={{
-      fontSize: 24,
-    }}
-    spin
-  />
-);
+import ButtonSpinner from "../components/ButtonSpinner.jsx";
 
 const EditRowForm = ({
   showDrawer,
@@ -23,12 +15,33 @@ const EditRowForm = ({
   employee,
 }) => {
   const [submitting, setSubmitting] = useState(false);
-  console.log(employee);
+  //   console.log(employee);
 
   const onClose = () => {
     setShowDrawer(false);
   };
+
+  const compareJSON = (objectA, objectB) => {
+    // this function check whether A fits B (all k-v in A have the same k-v in B),
+    // return true if all match
+    for (let key in objectA) {
+      if (!(key in objectB) || objectA[key] !== objectB[key]) {
+        return false;
+      }
+    }
+    return true;
+  };
   const onFinish = (values) => {
+    if (compareJSON(values, employee)) {
+      //check whether any update made, if not shoot notification and quit
+      warningNotificationWithIcon(
+        "No change has been made!",
+        `The employee with id: ${employee.id} is not updated`
+      );
+      return;
+    }
+
+    values.id = employee.id;
     setSubmitting(true);
     values.id = employee.id;
     console.log(JSON.stringify(values, null, 2));
@@ -211,13 +224,16 @@ const EditRowForm = ({
           <Row>
             <Col span={12}>
               <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Update
-                </Button>
+                {submitting ? (
+                  <ButtonSpinner />
+                ) : (
+                  <Button type="primary" htmlType="submit">
+                    Update
+                  </Button>
+                )}
               </Form.Item>
             </Col>
           </Row>
-          <Row>{submitting && <Spin indicator={spinner} />}</Row>
         </Form>
       </Drawer>
     </>

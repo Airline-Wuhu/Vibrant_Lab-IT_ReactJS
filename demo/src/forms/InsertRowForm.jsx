@@ -1,20 +1,11 @@
-import { Button, Col, Drawer, Form, Input, Row, Spin } from "antd";
+import { Button, Col, Drawer, Form, Input, Row, } from "antd";
 import { addNewEmployee } from "../client.jsx";
-import { LoadingOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
 } from "./Notification";
-
-const spinner = (
-  <LoadingOutlined
-    style={{
-      fontSize: 24,
-    }}
-    spin
-  />
-);
+import ButtonSpinner from "../components/ButtonSpinner.jsx";
 
 function InsertRowForm({ showDrawer, setShowDrawer, fetchEmployees }) {
   const [submitting, setSubmitting] = useState(false);
@@ -210,13 +201,16 @@ function InsertRowForm({ showDrawer, setShowDrawer, fetchEmployees }) {
           <Row>
             <Col span={12}>
               <Form.Item>
-                <Button type="primary" htmlType="submit">
-                  Submit
-                </Button>
+                {submitting ? (
+                  <ButtonSpinner />
+                ) : (
+                  <Button type="primary" htmlType="submit">
+                    Update
+                  </Button>
+                )}
               </Form.Item>
             </Col>
           </Row>
-          <Row>{submitting && <Spin indicator={spinner} />}</Row>
         </Form>
       </Drawer>
     </>
