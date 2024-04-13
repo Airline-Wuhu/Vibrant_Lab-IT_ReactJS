@@ -1,14 +1,14 @@
-import { Table, Button, Tag, Badge, Popconfirm, Radio } from "antd";
+import { Table, Button, Tag, Badge, Popconfirm, Flex } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { getAllEmployees } from "./client";
-import InsertRowForm from "./forms/InsertRowForm";
 import { useState, useEffect } from "react";
 import { deleteEmployee } from "./client";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
 } from "./forms/Notification";
-
+import InsertRowForm from "./forms/InsertRowForm";
+import EditRowForm from "./forms/EditRowForm";
 const removeEmployee = (employID, callback) => {
   deleteEmployee(employID)
     .then(() => {
@@ -25,7 +25,7 @@ const removeEmployee = (employID, callback) => {
     });
 };
 
-const columns = (fetchEmployees) => [
+const columns = (fetchEmployees, { setShowEditDrawer, setEditedEmployee }) => [
   {
     title: "ID",
     dataIndex: "id",
@@ -61,26 +61,27 @@ const columns = (fetchEmployees) => [
     title: "Actions",
     key: "actions",
     render: (employee) => (
-      <Popconfirm
-        title="Delete the Employee"
-        description="Are you sure to delete this employee record?"
-        onConfirm={() => removeEmployee(employee.id, fetchEmployees)}
-        okText="Yes"
-        cancelText="No"
-      >
-        <Button danger>Delete</Button>
-      </Popconfirm>
-      //   <Popconfirm
-      //     placement="topRight"
-      //     title={`Are you sure to delete ${employee.name}?`}
-      //     // onConfirm = {() => removeStudent(employee.id, fetchStudents)}
-      //     okText="Yes"
-      //     cancelText="No"
-      //   >
-      //     {/* <Radio.Button value="small">Delete</Radio.Button> */}
-      //   </Popconfirm>
-      //   <Radio.Button value="small">Delete</Radio.Button>
-      // </Radio.Group>
+      <Flex gap="small" wrap="wrap">
+        <Button
+          type="primary"
+          onClick={() => {
+            console.log("onclick: ", employee);
+            setEditedEmployee(employee);
+            setShowEditDrawer(true);
+          }}
+        >
+          edit
+        </Button>
+        <Popconfirm
+          title="Delete the Employee"
+          description="Are you sure to delete this employee record?"
+          onConfirm={() => removeEmployee(employee.id, fetchEmployees)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button danger>Delete</Button>
+        </Popconfirm>
+      </Flex>
     ),
   },
 ];
@@ -111,8 +112,10 @@ const filterData = (data, filterWord) => {
 };
 
 const EmployeeTable = ({ searchText }) => {
-  const [showDrawer, setShowDrawer] = useState(false);
+  const [showInsertDrawer, setShowInsertDrawer] = useState(false);
+  const [showEditDrawer, setShowEditDrawer] = useState(false);
   const [employeesData, setEmployeesData] = useState([]);
+  const [editedEmployee, setEditedEmployee] = useState({});
 
   const fetchEmployees = () =>
     getAllEmployees()
@@ -122,15 +125,8 @@ const EmployeeTable = ({ searchText }) => {
         // console.log("modified data: ", modifiedData);
         setEmployeesData(modifiedData); // Set the modified data in the state
       })
-      .catch((err) => {
-        console.log(err.response);
-        err.response.json().then((res) => {
-          console.log(res);
-          errorNotificationWithIcon(
-            "Something happened",
-            `${res.message} [statusCode: ${res.status}]`
-          );
-        });
+      .catch((error) => {
+        console.error("Error fetching employees:", error);
       });
 
   useEffect(() => {
@@ -141,17 +137,28 @@ const EmployeeTable = ({ searchText }) => {
   return (
     <>
       <InsertRowForm
-        showDrawer={showDrawer}
-        setShowDrawer={setShowDrawer}
+        showDrawer={showInsertDrawer}
+        setShowDrawer={setShowInsertDrawer}
         fetchEmployees={fetchEmployees}
       />
+      <EditRowForm
+        key={editedEmployee.key} //force re-render of editform
+        showDrawer={showEditDrawer}
+        setShowDrawer={setShowEditDrawer}
+        fetchEmployees={fetchEmployees}
+        employee={editedEmployee}
+      />
+
       <Table
-        columns={columns(fetchEmployees)}
+        columns={columns(fetchEmployees, {
+          setShowEditDrawer,
+          setEditedEmployee,
+        })}
         dataSource={filterData(employeesData, searchText)}
         title={() => (
           <>
             <Button
-              onClick={() => setShowDrawer(!showDrawer)}
+              onClick={() => setShowInsertDrawer(!showInsertDrawer)}
               type="primary"
               shape="round"
               icon={<PlusOutlined />}
@@ -164,7 +171,7 @@ const EmployeeTable = ({ searchText }) => {
             <Tag>Number of TOTAL employees</Tag>
             <Badge
               className="site-badge-count"
-              // count={employeesData.length}
+              count={employeesData.length}
               style={{ backgroundColor: "#52c41a" }}
               showZero={true}
             />
@@ -173,7 +180,7 @@ const EmployeeTable = ({ searchText }) => {
             <Tag>Number of FILTERED employees</Tag>
             <Badge
               className="site-badge-count"
-              // count={modifiedData.length}
+              count={filterData(employeesData, searchText).length}
               style={{ backgroundColor: "#52c41a" }}
               showZero={true}
             />

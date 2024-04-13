@@ -59,16 +59,18 @@ let fakeDataBase = [
 ];
 
 export const getAllEmployees = () => {
-    return new Promise((resolve, reject) => {
-      try {
-        // console.log("fake database: ", fakeDataBase);
-        resolve(fakeDataBase);
-      } catch (error) {
-        reject(error);
+  return new Promise((resolve, reject) => {
+    try {
+      if (fakeDataBase) {
+        resolve(fakeDataBase); // Resolve with the fakeDataBase
+      } else {
+        reject("Fake database is not available."); // Reject with an error message
       }
-    });
-  };
-  
+    } catch (error) {
+      reject(error); // Reject with the caught error
+    }
+  });
+};
 
 export const addNewEmployee = (newEmployee) => {
   if (fakeDataBase.some((employee) => employee.id === newEmployee.id))
@@ -81,5 +83,15 @@ export const deleteEmployee = (employeeId) => {
   if (!fakeDataBase.find((employee) => employee.id === employeeId))
     return Promise.reject("Employee ID not found!");
   fakeDataBase = fakeDataBase.filter((employee) => employee.id != employeeId);
+  return Promise.resolve(); // Return a resolved Promise
+};
+export const updateEmployee = (updatedEmployee) => {
+  if (!fakeDataBase.some((employee) => employee.id === updatedEmployee.id))
+    return Promise.reject("Employee ID not found!");
+  fakeDataBase.forEach((employee) => {
+    if (employee.id === updatedEmployee.id)
+      Object.assign(employee, updatedEmployee);
+  });
+  console.log(fakeDataBase);
   return Promise.resolve(); // Return a resolved Promise
 };
