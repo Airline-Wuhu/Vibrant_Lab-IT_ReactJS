@@ -58,16 +58,28 @@ let fakeDataBase = [
   },
 ];
 
-export const getAllEmployees = () => fakeDataBase;
+export const getAllEmployees = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        // console.log("fake database: ", fakeDataBase);
+        resolve(fakeDataBase);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+  
 
 export const addNewEmployee = (newEmployee) => {
-    if (fakeDataBase.some(employee => employee.id === newEmployee.id ))
+  if (fakeDataBase.some((employee) => employee.id === newEmployee.id))
     return Promise.reject("Employee ID taken! Please try a new ID.");
-    fakeDataBase = fakeDataBase.concat(newEmployee);
-    return Promise.resolve(); // Return a resolved Promise
+  fakeDataBase = fakeDataBase.concat(newEmployee);
+  return Promise.resolve(); // Return a resolved Promise
 };
 
-// export const deleteStudent = studentId =>
-//     fetch(`api/v1/students/${studentId}`, {
-//             method: 'DELETE'
-//         }).then(checkStatus);
+export const deleteEmployee = (employeeId) => {
+  if (!fakeDataBase.find((employee) => employee.id === employeeId))
+    return Promise.reject("Employee ID not found!");
+  fakeDataBase = fakeDataBase.filter((employee) => employee.id != employeeId);
+  return Promise.resolve(); // Return a resolved Promise
+};
