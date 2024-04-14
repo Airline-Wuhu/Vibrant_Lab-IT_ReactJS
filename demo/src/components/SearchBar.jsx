@@ -1,3 +1,4 @@
+// search bar component,takes in hook to automaticallu update the search text
 import { Input } from "antd";
 
 const SearchBar = ({ searchText, setSearchText }) => {

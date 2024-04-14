@@ -1,8 +1,8 @@
 import { Breadcrumb, Layout, Image, Menu } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState, useRef, useEffect } from "react";
-import EmployeeTable from "./EmployeeTable";
-import SearchBar from "./SearchBar";
+import EmployeeTable from "./components/EmployeeTable";
+import SearchBar from "./components/SearchBar";
 const { Header, Content, Sider, Footer } = Layout;
 
 const App = () => {
@@ -58,6 +58,7 @@ const App = () => {
                 />
               ),
               title: "search",
+              danger: true,
             },
           ]}
         />
@@ -95,7 +96,7 @@ const App = () => {
             textAlign: "center",
           }}
         >
-          This is a footer!
+          Happy Hacking!
           <br />
           <Image
             width={35}

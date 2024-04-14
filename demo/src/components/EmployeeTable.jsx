@@ -1,15 +1,18 @@
+// this is a table component to display employee information
+
 import { Table, Button, Tag, Badge, Popconfirm, Flex } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { getAllEmployees, deleteEmployee } from "./client";
+import { getAllEmployees, deleteEmployee } from "../client";
 import { useState, useEffect } from "react";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
-} from "./forms/Notification";
-import InsertRowForm from "./forms/InsertRowForm";
-import EditRowForm from "./forms/EditRowForm";
-import LoadingPage from "./components/LoadingPage";
+} from "./Notification";
+import InsertRowForm from "../forms/InsertRowForm";
+import EditRowForm from "../forms/EditRowForm";
+import LoadingPage from "./LoadingPage";
 
+// function to delete one employee entry, take in employee id and a callback funciton(call after delete)
 const removeEmployee = (employID, callback) => {
   deleteEmployee(employID)
     .then(() => {
@@ -26,6 +29,7 @@ const removeEmployee = (employID, callback) => {
     });
 };
 
+// this is the columns design
 const columns = (
   fetchEmployees,
   { setShowEditDrawer, setEditedEmployee, setFetching }
@@ -95,6 +99,7 @@ const columns = (
   ];
 };
 
+// built-in function from antd, to log changes when the table is altered
 const onChange = (pagination, filters, sorter, extra) => {
   console.log("params", pagination, filters, sorter, extra);
 };
@@ -121,13 +126,14 @@ const filterData = (data, filterWord) => {
 };
 
 const EmployeeTable = ({ searchText }) => {
-  const [showInsertDrawer, setShowInsertDrawer] = useState(false);
-  const [showEditDrawer, setShowEditDrawer] = useState(false);
-  const [fetching, setFetching] = useState(false);
+  const [showInsertDrawer, setShowInsertDrawer] = useState(false); // hook to control insert drawer
+  const [showEditDrawer, setShowEditDrawer] = useState(false); // hook to control edit drawer
+  const [fetching, setFetching] = useState(false); // hook to control loading page
 
-  const [employeesData, setEmployeesData] = useState([]);
-  const [editedEmployee, setEditedEmployee] = useState({});
+  const [employeesData, setEmployeesData] = useState([]); // hook to store all employee information fetched from backend
+  const [editedEmployee, setEditedEmployee] = useState({}); // hook to store the json of employee being edited
 
+  // function to fetch all employee info from backend
   const fetchEmployees = () => {
     setFetching(true);
     getAllEmployees()
@@ -143,6 +149,7 @@ const EmployeeTable = ({ searchText }) => {
       .finally(() => setFetching(false));
   };
 
+  // use effect to trigger fetch employee when first loaded
   useEffect(() => {
     console.log("component is mounted");
     fetchEmployees();
@@ -162,6 +169,7 @@ const EmployeeTable = ({ searchText }) => {
         fetchEmployees={fetchEmployees}
         employee={editedEmployee}
       />
+
       {fetching ? (
         <LoadingPage
           message={"No data available yet... "}

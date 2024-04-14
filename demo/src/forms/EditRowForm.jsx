@@ -1,11 +1,12 @@
-import { Button, Col, Drawer, Form, Input, Row, Spin } from "antd";
+// form to update information of a single employee
+import { Button, Col, Drawer, Form, Input, Row } from "antd";
 import { updateEmployee } from "../client.jsx";
 import { useState } from "react";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
   warningNotificationWithIcon,
-} from "./Notification";
+} from "../components/Notification.jsx";
 import ButtonSpinner from "../components/ButtonSpinner.jsx";
 
 const EditRowForm = ({
@@ -14,7 +15,7 @@ const EditRowForm = ({
   fetchEmployees,
   employee,
 }) => {
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false); //hook to record submit state, used to set spinner
   //   console.log(employee);
 
   const onClose = () => {
@@ -41,10 +42,10 @@ const EditRowForm = ({
       return;
     }
 
-    values.id = employee.id;
-    setSubmitting(true);
-    values.id = employee.id;
-    console.log(JSON.stringify(values, null, 2));
+    setSubmitting(true); // start the submit process
+    
+    values.id = employee.id;// add id to updated json
+    // console.log(JSON.stringify(values, null, 2));
     updateEmployee(values)
       .then(() => {
         console.log("Employee updated");

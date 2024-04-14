@@ -1,20 +1,27 @@
-import { Button, Col, Drawer, Form, Input, Row, } from "antd";
+// this is a form used to add new employee entry
+
+import { Button, Col, Drawer, Form, Input, Row } from "antd";
 import { addNewEmployee } from "../client.jsx";
 import { useState } from "react";
 import {
   successNotificationWithIcon,
   errorNotificationWithIcon,
-} from "./Notification";
+} from "../components/Notification.jsx";
 import ButtonSpinner from "../components/ButtonSpinner.jsx";
 
 function InsertRowForm({ showDrawer, setShowDrawer, fetchEmployees }) {
   const [submitting, setSubmitting] = useState(false);
+
+  // onclose function used in drawer, set the hook to false to hide the drawer
   const onClose = () => {
     setShowDrawer(false);
   };
+
+  // onfinish function triggered when submit the form in drawer,
+  // it add the values to database and refetch the information
   const onFinish = (values) => {
     setSubmitting(true);
-    console.log(JSON.stringify(values, null, 2));
+    // console.log(JSON.stringify(values, null, 2));
     addNewEmployee(values)
       .then(() => {
         console.log("Employee added");

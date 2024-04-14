@@ -1,8 +1,8 @@
 // this file mimic the api calls to backend apis
 // all method returns a promise to mimic the results from backend
 
-const delayTimeLapse = 2000; 
-// this is a variable to mimic the delay from backend
+const delayTimeLapse = 1500; 
+// this is a variable to mimic the delay from backend(in ms)
 
 let fakeDataBase = [
   {

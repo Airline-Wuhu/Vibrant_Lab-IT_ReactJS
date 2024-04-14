@@ -1,3 +1,6 @@
+// notification components, can choose from success | error | info | warning. 
+// each comes with different design and duration
+
 import {notification} from "antd";
 
 const openNotificationWithIcon = (type, msg, description, placement, duration = 0) => {

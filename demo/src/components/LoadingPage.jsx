@@ -1,12 +1,10 @@
-import { Spin, Alert } from 'antd';
+// this is a leading page component which shows a spinner and alert messages
 
-const LoadingPage = ({message, description}) => (
-  <Spin tip="Fetching data..." size='large'>
-    <Alert
-      message={message}
-      description={description}
-      type="info"
-    />
+import { Spin, Alert } from "antd";
+
+const LoadingPage = ({ message, description }) => (
+  <Spin tip="Fetching data..." size="large">
+    <Alert message={message} description={description} type="info" />
   </Spin>
 );
 
